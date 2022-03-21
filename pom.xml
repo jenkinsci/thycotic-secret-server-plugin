@@ -19,7 +19,7 @@
           ~ jenkins-test-harness.version: Jenkins Test Harness version you use to test the plugin. For Jenkins version >= 1.580.1 use JTH 2.0 or higher.
           ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
           ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin. -->
-        <spring.version>5.3.7</spring.version>
+        <spring.version>5.3.14</spring.version>
     </properties>
     <name>Thycotic Secret Server Plugin</name>
     <!-- The default licence for Jenkins OSS Plugins is MIT. Substitute for the applicable one if needed. -->
