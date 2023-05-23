@@ -1,6 +1,7 @@
 package com.thycotic.secrets.jenkins;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.console.ConsoleLogFilter;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -34,6 +36,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
     private static final String OAUTH2_TOKEN_URL_PROPERTY = "secret_server.oauth2.token_url";
 
     private List<ServerSecret> secrets;
+    private List<String> valuesToMask = new ArrayList<>();
 
     @DataBoundConstructor
     public ServerBuildWrapper(final List<ServerSecret> secrets) {
@@ -47,6 +50,11 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
     @DataBoundSetter
     public void setSecrets(final List<ServerSecret> secrets) {
         this.secrets = secrets;
+    }
+
+    @Override
+    public ConsoleLogFilter createLoggerDecorator(final Run<?, ?> build) {
+        return new ServerConsoleLogFilter(build.getCharset().name(), valuesToMask);
     }
 
     @Override
@@ -95,6 +103,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
                         // Prepend the the environment variable prefix
                         context.env(StringUtils.trimToEmpty(configuration.getEnvironmentVariablePrefix())
                                 + mapping.getEnvironmentVariable(), field.getValue());
+                        valuesToMask.add(field.getValue());
                     }
                 });
             });
