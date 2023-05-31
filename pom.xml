@@ -72,7 +72,7 @@
         <dependency>
             <groupId>com.thycotic.secrets</groupId>
             <artifactId>tss-sdk-java</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>

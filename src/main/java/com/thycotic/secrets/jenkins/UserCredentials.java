@@ -17,6 +17,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.security.ACL;
+import jenkins.model.Jenkins;
 
 public class UserCredentials extends UsernamePasswordCredentialsImpl implements StandardCredentials {
     private static final long serialVersionUID = 1L;
@@ -29,9 +30,16 @@ public class UserCredentials extends UsernamePasswordCredentialsImpl implements 
      * @return the credentials or {@code null} if no matching credentials exist
      */
     public static UserCredentials get(@Nonnull final String credentialId, @Nullable final Item item) {
-        return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentials(UserCredentials.class, item, ACL.SYSTEM, Collections.emptyList()),
-                new IdMatcher(credentialId));
+        if(Jenkins.get().hasPermission(CredentialsProvider.VIEW))
+        {
+            return CredentialsMatchers.firstOrNull(
+                    CredentialsProvider.lookupCredentials(UserCredentials.class, item, ACL.SYSTEM, Collections.emptyList()),
+                    new IdMatcher(credentialId));
+        }
+        else
+        {
+            return null;
+        }
     }
 
     @DataBoundConstructor

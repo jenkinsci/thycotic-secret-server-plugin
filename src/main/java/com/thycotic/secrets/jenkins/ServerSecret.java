@@ -22,6 +22,7 @@ import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 
 /**
  * A Thycotic SecretServer Secret, identified by it's id, and a list of mappings
@@ -126,6 +127,10 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
         }
 
         public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
+            if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER) ||
+                    item != null && !item.hasPermission(Item.CONFIGURE)) {
+                return new StandardListBoxModel();
+            }
             return new StandardListBoxModel().includeAs(ACL.SYSTEM, item, UserCredentials.class).includeEmptyValue();
         }
 
