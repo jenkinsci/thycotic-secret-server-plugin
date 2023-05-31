@@ -21,6 +21,7 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 
 @Extension
 @Symbol("secretServer")
@@ -87,6 +88,10 @@ public class ServerConfiguration extends GlobalConfiguration {
     }
 
     public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
+        if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER) ||
+                item != null && !item.hasPermission(Item.CONFIGURE)) {
+            return new StandardListBoxModel();
+        }
         return new StandardListBoxModel().includeEmptyValue().includeAs(ACL.SYSTEM, item, UserCredentials.class);
     }
 
