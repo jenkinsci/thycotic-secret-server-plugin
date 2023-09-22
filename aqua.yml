@@ -1,0 +1,18 @@
+---
+# aqua - Declarative CLI Version Manager
+# https://aquaproj.github.io/
+# checksum:
+#   # https://aquaproj.github.io/docs/reference/checksum/
+#   enabled: true
+#   require_checksum: true
+#   supported_envs:
+#   - all
+registries:
+  - type: standard
+    ref: v3.157.0 # renovate: depName=aquaproj/aqua-registry
+packages:
+  - name: miniscruff/changie@v1.12.0
+  - name: go-task/task@v3.24.0
+  - name: cli/cli@v2.27.0
+  - name: charmbracelet/gum@v0.10.0
+  - name: charmbracelet/glow@v1.5.0

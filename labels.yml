@@ -1,0 +1,51 @@
+---
+- name: stale-issue
+  color: "#2ee5b7"
+  description: An issue that has not been updated recently and is considered stale.
+- name: stale-pr
+  color: "#b69ca1"
+  description: An pull request that has not been updated recently and is considered stale.
+- name: pinned
+  color: "#b6f7a1"
+  description: This will be ignored by any stale issue or PR evaluation.
+- name: question
+  color: "#b6f7a1"
+  description: question type
+- name: wontfix
+  color: "#b6f7a1"
+  description: This will not be worked on.
+- name: duplicate
+  color: "#b6f7a1"
+  description: This issue or pull request already has prior history.
+
+## the following labels are required by the jenkins PR release drafting
+- name: breaking
+  color: "#f5b9d9"
+  description: Breaking change
+- name: major-enhancement
+  color: "#b2d6b2"
+  description: Major enhancement
+- name: feature
+  color: "#1f3f3c"
+  description: Feature
+- name: bug
+  color: "#31288e"
+  description: Bug
+- name: developer
+  color: "#1b1b1b"
+  description: Developer
+- name: dependencies
+  color: "#AABBCC"
+  description: Dependency updates
+- name: documentation
+  color: "#1c7454"
+  description: Documentation
+- name: chore
+  color: "#b7bb68"
+  description: Chore
+- name: internal
+  color: "#094af7"
+  description: Internal
+- name: test
+  color: "#2b84a5"
+  description: Test

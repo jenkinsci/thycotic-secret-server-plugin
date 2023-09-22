@@ -1,0 +1,27 @@
+---
+name: ♻️ Sync Labels
+on:
+  workflow_dispatch:
+  push:
+    #   tags:
+    #     - 'v*'
+    branches: [master]
+    paths: [.github/labels.yaml]
+
+jobs:
+  labels:
+    name: ♻️ Sync labels
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v3
+
+      - name: 🚀 Run Label Sync
+        uses: srealmoreno/label-sync-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: |
+            .github/labels.yaml
+          exclude-forked-repos: false # cause this repo is forked, we aren't using the original any more, let's let it sync
+          exclude-private-repos: true
+          clean-labels: true # only labels in this repo should exist

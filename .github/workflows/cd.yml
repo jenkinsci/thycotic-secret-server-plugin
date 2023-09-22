@@ -2,14 +2,14 @@ name: cd
 
 on:
   workflow_dispatch:
-  #push:
-  #  branches:
-  #    - master
-  #  paths:
-  #    - CHANGELOG.md
-  check_run:
-    types:
-      - completed
+  push:
+    branches:
+      - master
+    paths:
+      - CHANGELOG.md
+  # check_run:
+  #   types:
+  #     - completed
       
 permissions:
   checks: read
@@ -35,9 +35,7 @@ jobs:
           name: next
           tag: next
           version: next
-        run: |
-          releaseNotes=$(cat .changes/1.0.3.md)
-          echo "::set-output name=release_notes::$releaseNotes"
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -1,0 +1,56 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+  config:
+    desc: ensure config for github cli is set to create releases at jenkinsci
+    cmds:
+      - |
+        if ! gh config get prompt; then
+          echo "configuring github cli"
+          gh repo set-default jenkinsci/thycotic-secret-server-plugin
+        fi
+  bump:
+    desc: bump the version using changie
+    cmds:
+      - changie batch 1.0.3
+      - changie merge
+      - git add .changes/*
+      - git add CHANGELOG.md
+  changelog:refresh:
+    desc: refresh the changelog without trying to create a new version
+    cmds:
+      - changie merge
+  changelog:latest:
+    desc: show the latest changelog entry (which will power the release draft)
+    cmds:
+      - glow .changes/$(changie latest).md
+  release:
+    desc: create a draft release called "next" for jenkinsci to create a release from once PR merged
+    interactive: true
+    cmds:
+      - |
+        gum format "## Draft Release Content"
+        glow ".changes/$(changie latest).md"
+        gum confirm "proceed with creating draft release?" && gh release create 'next' --title 'next' --draft --notes-file=.changes/$(changie latest).md
+  pr:
+    desc: create a PR for the next release
+    interactive: true
+    cmds:
+      - |
+        gum format "## Draft PR Content"
+        glow ".changes/$(changie latest).md"
+        gum format "Choose Label for PR"
+        label=$(gum choose breaking major-enhancement feature bug developer dependencies documentation chore internal test)
+        echo "👉 label chosen: $label"
+        title=$(gum input --prompt "conventional commit pr title > ")
+        echo "👉 title chosen: $title"
+        gum confirm "proceed with creating PR?" && gh pr create \
+          --title "${title}" \
+          --label "${label}" \
+          --body-file=.changes/$(changie latest).md
