@@ -2,9 +2,14 @@ name: cd
 
 on:
   workflow_dispatch:
-  check_run:
-    types:
-      - completed
+  push:
+    branches:
+      - master
+    paths:
+      - CHANGELOG.md
+  # check_run:
+  #   types:
+  #     - completed
       
 permissions:
   checks: read
