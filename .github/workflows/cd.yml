@@ -34,8 +34,7 @@ jobs:
         with:
           name: next
           tag: next
-          version: next
-          
+          version: next 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
