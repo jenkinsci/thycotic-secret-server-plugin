@@ -13,6 +13,7 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -57,7 +58,7 @@ public class ServerConfiguration extends GlobalConfiguration {
         }
     }
 
-    private String credentialId, baseUrl, apiPathUri = DEFAULT_API_PATH_URI, tokenPathUri = DEFAULT_TOKEN_PATH_URI,
+    private String credentialId, baseUrl, apiPathUri = DEFAULT_API_PATH_URI, tknPathUri = DEFAULT_TOKEN_PATH_URI,
             environmentVariablePrefix = DEFAULT_ENVIRONMENT_VARIABLE_PREFIX;
 
     /**
@@ -83,10 +84,15 @@ public class ServerConfiguration extends GlobalConfiguration {
         load();
     }
 
+    @POST
     public FormValidation doCheckBaseUrl(@QueryParameter final String value) throws IOException, ServletException {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+            return FormValidation.error("You do not have permission to perform this action");
+        }
         return checkBaseUrl(value);
     }
 
+    @POST
     public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
         if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER) ||
                 item != null && !item.hasPermission(Item.CONFIGURE)) {
@@ -136,12 +142,12 @@ public class ServerConfiguration extends GlobalConfiguration {
     }
 
     public String getTokenPathUri() {
-        return tokenPathUri;
+        return tknPathUri;
     }
 
     @DataBoundSetter
     public void setTokenPathUri(final String tokenPathUri) {
-        this.tokenPathUri = StringUtils.strip(tokenPathUri);
+        this.tknPathUri = StringUtils.strip(tokenPathUri);
         save();
     }
 }
