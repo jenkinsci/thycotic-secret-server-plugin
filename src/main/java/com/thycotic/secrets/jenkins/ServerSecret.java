@@ -14,6 +14,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
@@ -92,7 +93,11 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
                 return "Secret Field to Environment Variable Mapping";
             }
 
+            @POST
             private FormValidation checkPattern(final String value, final String name) {
+                if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                    return FormValidation.error("You do not have permission to perform this action");
+                }
                 if (Pattern.matches(NAME_PATTERN, value))
                     return FormValidation.ok();
                 return FormValidation.error(String.format("%s must match %s", name, NAME_PATTERN));
@@ -119,13 +124,18 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
             return "Secret Server Secret";
         }
 
+        @POST
         public FormValidation doCheckCredentialId(@QueryParameter final String value)
                 throws IOException, ServletException {
+            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                return FormValidation.error("You do not have permission to perform this action");
+            }
             if (StringUtils.isBlank(value) && StringUtils.isBlank(ServerConfiguration.get().getCredentialId()))
                 return FormValidation.error("Credentials are required");
             return FormValidation.ok();
         }
 
+        @POST
         public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
             if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER) ||
                     item != null && !item.hasPermission(Item.CONFIGURE)) {
@@ -134,8 +144,12 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
             return new StandardListBoxModel().includeAs(ACL.SYSTEM, item, UserCredentials.class).includeEmptyValue();
         }
 
+        @POST
         public FormValidation doCheckId(@QueryParameter final String value) throws IOException, ServletException {
             try {
+                if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                    return FormValidation.error("You do not have permission to perform this action");
+                }
                 Integer.parseInt(value);
                 return FormValidation.ok();
             } catch (final NumberFormatException e) {
@@ -143,7 +157,11 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
             }
         }
 
+        @POST
         public FormValidation doCheckBaseUrl(@QueryParameter final String value) throws IOException, ServletException {
+            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                return FormValidation.error("You do not have permission to perform this action");
+            }
             if (StringUtils.isBlank(value) && StringUtils.isNotBlank(ServerConfiguration.get().getBaseUrl()))
                 return FormValidation.ok();
             return ServerConfiguration.checkBaseUrl(value);
