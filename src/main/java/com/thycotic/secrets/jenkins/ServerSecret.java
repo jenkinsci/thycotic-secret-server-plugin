@@ -93,7 +93,6 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
                 return "Secret Field to Environment Variable Mapping";
             }
 
-            @POST
             private FormValidation checkPattern(final String value, final String name) {
                 if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
                     return FormValidation.error("You do not have permission to perform this action");
@@ -104,11 +103,13 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
 
             }
 
+            @POST
             public FormValidation doCheckEnvironmentVariable(@QueryParameter final String value)
                     throws IOException, ServletException {
                 return checkPattern(value, "Environment Variable");
             }
 
+            @POST
             public FormValidation doCheckField(@QueryParameter final String value)
                     throws IOException, ServletException {
                 return checkPattern(value, "Field Name");
