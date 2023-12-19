@@ -6,9 +6,7 @@ import hudson.model.Run;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import org.jenkinsci.plugins.credentialsbinding.masking.SecretPatterns;
 
@@ -16,22 +14,15 @@ import org.jenkinsci.plugins.credentialsbinding.masking.SecretPatterns;
 public class ServerConsoleLogFilter extends ConsoleLogFilter implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String charsetName;
-    private final List<String> valuesToMask;
+    private final Pattern valuesToMask;
 
-    public ServerConsoleLogFilter(final String charsetName, final List<String> valuesToMask) {
+    public ServerConsoleLogFilter(final String charsetName, final Pattern valuesToMask) {
         this.charsetName = charsetName;
         this.valuesToMask = valuesToMask;
     }
 
     @Override
     public OutputStream decorateLogger(Run run, final OutputStream logger) throws IOException, InterruptedException {
-        return new SecretPatterns.MaskingOutputStream(logger, () -> {
-                List<String> values = valuesToMask.stream().filter(Objects::nonNull).collect(Collectors.toList());
-                if (!values.isEmpty()) {
-                    return SecretPatterns.getAggregateSecretPattern(values);
-                } else {
-                    return null;
-                }
-            },charsetName);
+        return new SecretPatterns.MaskingOutputStream(logger, () -> valuesToMask, charsetName);
     }
 }
