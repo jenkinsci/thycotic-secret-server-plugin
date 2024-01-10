@@ -103,7 +103,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
             // Add each Secret Field Value with a corresponding mapping to the environment
             secret.getFields().forEach(field -> {
                 serverSecret.getMappings().forEach(mapping -> {
-                    if (mapping.getField().equalsIgnoreCase(field.getFieldName())) {
+                    if (mapping.getField().equalsIgnoreCase(field.getFieldName()) || mapping.getField().equalsIgnoreCase(field.getSlug())) {
                         // Prepend the the environment variable prefix
                         context.env(StringUtils.trimToEmpty(configuration.getEnvironmentVariablePrefix())
                                 + mapping.getEnvironmentVariable(), field.getValue());

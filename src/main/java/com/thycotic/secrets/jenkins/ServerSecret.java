@@ -86,7 +86,7 @@ public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {
 
         @Extension
         public static final class DescriptorImpl extends Descriptor<Mapping> {
-            private static final String NAME_PATTERN = "[a-zA-Z_][a-zA-Z0-9]*";
+            private static final String NAME_PATTERN = "[a-zA-Z_-][a-zA-Z0-9 ]*";
 
             @Override
             public String getDisplayName() {
