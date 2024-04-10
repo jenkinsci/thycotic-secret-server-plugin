@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import com.thycotic.secrets.server.spring.Secret;
 import com.thycotic.secrets.server.spring.SecretServer;
@@ -29,8 +28,6 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildWrapperDescriptor;
 import jenkins.tasks.SimpleBuildWrapper;
-import org.jenkinsci.plugins.credentialsbinding.masking.SecretPatterns;
-import java.util.stream.Collectors;
 
 public class ServerBuildWrapper extends SimpleBuildWrapper {
     private static final String USERNAME_PROPERTY = "secret_server.oauth2.username";
@@ -57,8 +54,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
 
     @Override
     public ConsoleLogFilter createLoggerDecorator(final Run<?, ?> build) {
-    	List<String> values = valuesToMask.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        return new ServerConsoleLogFilter(build.getCharset().name(), !values.isEmpty() ? SecretPatterns.getAggregateSecretPattern(values) : null);
+    	return new ServerConsoleLogFilter(build.getCharset().name(), valuesToMask);
     }
 
     @Override
