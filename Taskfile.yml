@@ -18,7 +18,7 @@ tasks:
   bump:
     desc: bump the version using changie
     cmds:
-      - changie batch 1.0.7
+      - changie batch 1.0.8
       - changie merge
       - git add .changes/*
       - git add CHANGELOG.md
