@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>thycotic-secret-server</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <packaging>hpi</packaging>
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
@@ -57,17 +57,17 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
+            <version>5.3.24</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
+            <version>5.3.24</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
+            <version>5.3.24</version>
         </dependency>
         <dependency>
             <groupId>com.thycotic.secrets</groupId>

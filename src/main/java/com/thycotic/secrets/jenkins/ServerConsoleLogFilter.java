@@ -6,6 +6,7 @@ import hudson.model.Run;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,12 +39,24 @@ public class ServerConsoleLogFilter extends ConsoleLogFilter implements Serializ
     }
 
     public static Pattern getAggregateSecretPattern(List<String> patterns) {
-        String aggregatedPattern = String.join("|", patterns);
+        List<String> escapedPatterns = new ArrayList<>();
+        for (String pattern : patterns) {
+            escapedPatterns.add(ServerConsoleLogFilter.escapeSpecialCharacters(pattern));
+        }
+        String aggregatedPattern = String.join("|", escapedPatterns);
         try {
             return Pattern.compile(aggregatedPattern);
         } catch (PatternSyntaxException e) {
             System.err.println("Error compiling pattern: " + e.getMessage());
             return null;
         }
+    }
+
+    private static String escapeSpecialCharacters(String input) {
+        String[] specialChars = {"\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "]", "{", "}", "~", "@", "#", "%", "&", "_", "-", "=", "!", "/"};
+        for (String specialChar : specialChars) {
+            input = input.replace(specialChar, "\\" + specialChar);
+        }
+        return input;
     }
 }
