@@ -13,7 +13,7 @@ tasks:
       - |
         if ! gh config get prompt; then
           echo "configuring github cli"
-          gh repo set-default jenkinsci/thycotic-secret-server-plugin
+          gh repo set-default jenkinsci/delinea-secret-server-plugin
         fi
   bump:
     desc: bump the version using changie

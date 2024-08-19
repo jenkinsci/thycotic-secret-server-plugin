@@ -1,8 +1,8 @@
 # Delinea Secret Server
 
-[![Jenkins Plugin Build](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml/badge.svg)](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml)
+[![Jenkins Plugin Build](https://github.com/jenkinsci/delinea-secret-server-plugin/actions/workflows/package.yml/badge.svg)](https://github.com/jenkinsci/delinea-secret-server-plugin/actions/workflows/package.yml)
 
-The Thycotic Secret Server Jenkins Plugin allows you to access and reference your Secret Server secrets for use in Jenkins builds.
+The Delinea Secret Server Jenkins Plugin allows you to access and reference your Secret Server secrets for use in Jenkins builds.
 
 ## Usage
 
@@ -25,12 +25,12 @@ After you have added your credentials to the build environment you can can use t
 
 2. This plugin add the ability to include Secret Server Secrets into global credentials.
 
-![add-Secret-Server-vault-credential](images/Jenkins-Secret-Server-Vault-Credentila-Provider.jpg)
+![add-Secret-Server-vault-credential](images/jenkins-vault-credential-provider.jpg)
 
-1.	Create Credentials: 
+1. Create Credentials: 
 Create a `Secret Server user credentials` that contains the Secret Server service account credentials.
 
-2.	Configure Credentials: 
+2. Configure Credentials: 
 Enter the `Vault URL, Secret ID,` and select the previously created Secret Server user credential in the `Credential ID` field.
 > Note: that the Username and Password fields are read-only.
 
@@ -38,7 +38,7 @@ Enter the `Vault URL, Secret ID,` and select the previously created Secret Serve
 After filling in the required fields, click the `Test Connection` button.
 If all inputs are correct, a `Connection Successful` message will appear. Otherwise, an error message will be displayed.
 
-4.	Create and Fetch Secrets: 
+4. Create and Fetch Secrets: 
 Once the connection test is successful, click `Create` to fetch the secret from Secret.
 The fetched secret will include the username and password.
 
