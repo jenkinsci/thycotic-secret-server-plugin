@@ -1,4 +1,4 @@
-package com.thycotic.secrets.jenkins;
+package com.delinea.secrets.jenkins.wrapper.cred;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +26,7 @@ import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 
 /**
- * A Thycotic SecretServer Secret, identified by it's id, and a list of mappings
+ * A Delinea SecretServer Secret, identified by it's id, and a list of mappings
  * from the secret's data fields to environment variables.
  */
 public class ServerSecret extends AbstractDescribableImpl<ServerSecret> {

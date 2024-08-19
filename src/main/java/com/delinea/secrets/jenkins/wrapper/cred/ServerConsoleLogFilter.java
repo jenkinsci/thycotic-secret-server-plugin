@@ -1,4 +1,4 @@
-package com.thycotic.secrets.jenkins;
+package com.delinea.secrets.jenkins.wrapper.cred;
 
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;

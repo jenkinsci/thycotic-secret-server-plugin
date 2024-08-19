@@ -1,4 +1,4 @@
-package com.thycotic.secrets.jenkins;
+package com.delinea.secrets.jenkins.wrapper.cred;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,7 +121,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
 
         @Override
         public String getDisplayName() {
-            return "Use Thycotic Secret Server Secrets";
+            return "Use Delinea Secret Server Secrets";
         }
     }
 }
