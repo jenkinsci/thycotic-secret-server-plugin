@@ -72,7 +72,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	@Override
 	public String getUsername() {
-		return getVaultCredential().username;
+		return getVaultCredential().getUsername();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	@Override
 	public Secret getPassword() {
-		return Secret.fromString(getVaultCredential().password);
+		return Secret.fromString(getVaultCredential().getPassword());
 	}
 
 	/**
@@ -122,15 +122,24 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 * @param item - The Jenkins item context.
 		 * @return A ListBoxModel containing the available Credential IDs.
 		 */
+		@POST
 		public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
+			if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
+					|| item != null && !item.hasPermission(Item.CONFIGURE)) {
+				return new StandardListBoxModel();
+			}
 			return new StandardListBoxModel().includeAs(ACL.SYSTEM, item, UserCredentials.class).includeEmptyValue();
 		}
 
 		/**
 		 * Validates the Credential ID input by the user.
 		 */
+		@POST
 		public FormValidation doCheckCredentialId(@QueryParameter final String value)
 				throws IOException, ServletException {
+			if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+				return FormValidation.error("You do not have permission to perform this action");
+			}
 			if (StringUtils.isBlank(value)) {
 				return FormValidation.error("Credential ID is required.");
 			}
@@ -140,7 +149,11 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		/**
 		 * Validates the Secret ID input by the user.
 		 */
+		@POST
 		public FormValidation doCheckSecretId(@QueryParameter final String value) throws IOException, ServletException {
+			if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+				return FormValidation.error("You do not have permission to perform this action");
+			}
 			if (StringUtils.isBlank(value)) {
 				return FormValidation.error("Secret ID is required.");
 			}

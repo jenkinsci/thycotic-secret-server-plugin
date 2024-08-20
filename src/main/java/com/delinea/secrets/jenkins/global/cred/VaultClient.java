@@ -12,6 +12,7 @@ import com.thycotic.secrets.server.spring.Secret;
 import com.thycotic.secrets.server.spring.SecretServer;
 import com.thycotic.secrets.server.spring.SecretServerFactoryBean;
 
+
 public class VaultClient {
 	private static final String USERNAME_PROPERTY = "secret_server.oauth2.username";
 	private static final String PASSWORD_PROPERTY = "secret_server.oauth2.password";
@@ -49,7 +50,6 @@ public class VaultClient {
 		properties.put(PASSWORD_PROPERTY, password);
 
 		// Create and configure the application context with the Secret Server
-		// properties
 		try (AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext()) {
 			applicationContext.getEnvironment().getPropertySources()
 					.addLast(new MapPropertySource("properties", properties));
@@ -79,18 +79,20 @@ public class VaultClient {
 	}
 
 	public static class UsernamePassword {
-		public final String username;
-		public final String password;
+		private final String username;
+		private final hudson.util.Secret password;
 
-		/**
-		 * Constructor for UsernamePassword.
-		 *
-		 * @param username The username.
-		 * @param password The password.
-		 */
 		public UsernamePassword(String username, String password) {
 			this.username = username;
-			this.password = password;
+			this.password = hudson.util.Secret.fromString(password);
+		}
+
+		public String getPassword() {
+			return password.getPlainText();
+		}
+		
+		public String getUsername() {
+			return username;
 		}
 	}
 }
