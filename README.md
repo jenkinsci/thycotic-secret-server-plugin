@@ -8,7 +8,7 @@ The Delinea Secret Server Jenkins Plugin allows you to access and reference your
 
 1. This plugin add the ability to include Secret Server Secrets into your build environment.
 
-![build-environment](images/jenkins-build-environment.jpg)
+![build-environment](images/jenkins-build-environment.JPG)
 
 This is allows you to include the `Base URL` of you Secret Server and `Secret ID` you wish to access.
 
