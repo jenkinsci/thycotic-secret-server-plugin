@@ -25,7 +25,7 @@ After you have added your credentials to the build environment you can can use t
 
 2. This plugin add the ability to include Secret Server Secrets into global credentials.
 
-![add-Secret-Server-vault-credential](images/jenkins-vault-credential-provider.jpg)
+![add-Secret-Server-vault-credential](images/jenkins-vault-provider.jpg)
 
 1. Create Credentials: 
 Create a `Secret Server user credentials` that contains the Secret Server service account credentials.
