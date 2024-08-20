@@ -31,7 +31,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	private final String vaultUrl;
 	private final String credentialId;
 	private final String secretId;
-	private UsernamePassword vaultCredential; // Caches the credentials fetched from Secret Server
+	private final UsernamePassword vaultCredential; // Caches the credentials fetched from Secret Server
 
 	/**
 	 * Constructor to initialize the SecretServerCredentials object.
@@ -50,6 +50,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		this.vaultUrl = vaultUrl;
 		this.credentialId = credentialId;
 		this.secretId = secretId;
+		this.vaultCredential = null;
 	}
 
 	public String getVaultUrl() {
