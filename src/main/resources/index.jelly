@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?><?jelly escape-by-default="true"?>
-<div>Inject Thycotic Secret Server Secret fields into the build as environment variables.</div>
+<div>Inject Delinea Secret Server Secret fields into the build as environment variables.</div>
