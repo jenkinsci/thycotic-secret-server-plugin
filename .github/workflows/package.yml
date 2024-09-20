@@ -32,5 +32,5 @@ jobs:
       - name: Upload HPI File
         uses: actions/upload-artifact@v1
         with:
-          name: delinea-secret-server.hpi
-          path: target/delinea-secret-server.hpi
+          name: thycotic-secret-server.hpi
+          path: target/thycotic-secret-server.hpi
