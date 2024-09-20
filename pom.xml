@@ -8,7 +8,7 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>delinea-secret-server</artifactId>
+    <artifactId>thycotic-secret-server</artifactId>
     <version>1.0.9</version>
     <packaging>hpi</packaging>
     <properties>
@@ -21,7 +21,7 @@
           ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin. -->
         <spring.version>6.0.15</spring.version>
     </properties>
-    <name>Delinea Secret Server Plugin</name>
+    <name>Thycotic Secret Server Plugin</name>
     <!-- The default licence for Jenkins OSS Plugins is MIT. Substitute for the applicable one if needed. -->
     <licenses>
         <license>

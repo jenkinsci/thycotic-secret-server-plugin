@@ -1,6 +1,6 @@
 # Delinea Secret Server
 
-[![Jenkins Plugin Build](https://github.com/jenkinsci/delinea-secret-server-plugin/actions/workflows/package.yml/badge.svg)](https://github.com/jenkinsci/delinea-secret-server-plugin/actions/workflows/package.yml)
+[![Jenkins Plugin Build](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml/badge.svg)](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml)
 
 The Delinea Secret Server Jenkins Plugin allows you to access and reference your Secret Server secrets for use in Jenkins builds.
 
