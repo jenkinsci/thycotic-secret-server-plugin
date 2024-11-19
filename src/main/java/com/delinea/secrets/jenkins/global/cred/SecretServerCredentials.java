@@ -1,15 +1,21 @@
 package com.delinea.secrets.jenkins.global.cred;
 
 import java.io.IOException;
+import java.util.Collections;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.verb.POST;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -72,7 +78,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	@Override
 	public String getUsername() {
-		return getVaultCredential().getUsername();
+		return getVaultCredential(getContextItem()).getUsername();
 	}
 
 	/**
@@ -83,7 +89,20 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	@Override
 	public Secret getPassword() {
-		return Secret.fromString(getVaultCredential().getPassword());
+		return Secret.fromString(getVaultCredential(getContextItem()).getPassword());
+	}
+
+	@Nullable
+	private Item getContextItem() {
+		// Retrieve the nearest item in the current request context
+		if (Stapler.getCurrentRequest() != null) {
+			Item contextItem = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+			if (contextItem != null) {
+				return contextItem;
+			}
+		}
+		// Return null to signify global scope as fallback
+		return null;
 	}
 
 	/**
@@ -94,10 +113,14 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 * @throws RuntimeException if the credentials cannot be fetched from the Secret
 	 *                          Server.
 	 */
-	private UsernamePassword getVaultCredential() {
-		if (vaultCredential == null) { // Fetch only if not already cached
+	private UsernamePassword getVaultCredential(@Nullable Item contextItem) {
+		if (vaultCredential == null) {
 			try {
-				UserCredentials credential = UserCredentials.get(credentialId, null);
+				UserCredentials credential = UserCredentials.get(credentialId, contextItem);
+				if (credential == null) {
+					throw new RuntimeException(
+							"UserCredentials with the specified credentialId not found in the folder context.");
+				}
 				vaultCredential = new VaultClient().fetchCredentials(vaultUrl, secretId, credential.getUsername(),
 						credential.getPassword().getPlainText());
 			} catch (Exception e) {
@@ -123,25 +146,34 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 * @return A ListBoxModel containing the available Credential IDs.
 		 */
 		@POST
-		public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item item) {
-			if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)
-					|| item != null && !item.hasPermission(Item.CONFIGURE)) {
-				return new StandardListBoxModel();
-			}
-			return new StandardListBoxModel().includeAs(ACL.SYSTEM, item, UserCredentials.class).includeEmptyValue();
+		public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item owner) {
+		    // Check permissions for the current user
+		    if ((owner == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (owner != null && !owner.hasPermission(CredentialsProvider.CREATE))) {
+		        return new StandardListBoxModel(); // Return an empty model if permissions are missing
+		    }
+		    return new StandardListBoxModel()
+		            .includeEmptyValue() 
+		            .includeAs(ACL.SYSTEM, owner, UserCredentials.class); // Only include UserCredentials type
 		}
 
 		/**
 		 * Validates the Credential ID input by the user.
 		 */
 		@POST
-		public FormValidation doCheckCredentialId(@QueryParameter final String value)
+		public FormValidation doCheckCredentialId(@AncestorInPath Item item, @QueryParameter final String value)
 				throws IOException, ServletException {
-			if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-				return FormValidation.error("You do not have permission to perform this action");
-			}
+			if ((item == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (item != null && !item.hasPermission(CredentialsProvider.CREATE))) {
+		        return FormValidation.error("You do not have permission to perform this action.");
+		    }
 			if (StringUtils.isBlank(value)) {
 				return FormValidation.error("Credential ID is required.");
+			}
+			// Check if the Credential ID exists within the specified item context
+			if (CredentialsProvider.lookupCredentials(UserCredentials.class, item, ACL.SYSTEM, Collections.emptyList())
+					.stream().noneMatch(cred -> cred.getId().equals(value))) {
+				return FormValidation.error("Credential ID not found. Please provide a valid ID.");
 			}
 			return FormValidation.ok();
 		}
@@ -150,10 +182,12 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 * Validates the Secret ID input by the user.
 		 */
 		@POST
-		public FormValidation doCheckSecretId(@QueryParameter final String value) throws IOException, ServletException {
-			if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-				return FormValidation.error("You do not have permission to perform this action");
-			}
+		public FormValidation doCheckSecretId(@AncestorInPath final Item item, @QueryParameter final String value)
+				throws IOException, ServletException {
+			if ((item == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (item != null && !item.hasPermission(CredentialsProvider.CREATE))) {
+		        return FormValidation.error("You do not have permission to perform this action.");
+		    }
 			if (StringUtils.isBlank(value)) {
 				return FormValidation.error("Secret ID is required.");
 			}
@@ -180,15 +214,11 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 				@QueryParameter("vaultUrl") final String vaultUrl,
 				@QueryParameter("credentialId") final String credentialId,
 				@QueryParameter("secretId") final String secretId) {
+			if ((owner == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (owner != null && !owner.hasPermission(CredentialsProvider.CREATE))) {
+		        return FormValidation.error("You do not have permission to perform this action.");
+		    }
 
-			// Check for necessary permissions
-			if (owner == null) {
-				Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-			} else {
-				owner.checkPermission(Item.CONFIGURE);
-			}
-
-			// Validate inputs
 			if (StringUtils.isBlank(credentialId)) {
 				return FormValidation.error("Credential ID is required to test the connection.");
 			}
@@ -196,10 +226,9 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 			if (StringUtils.isBlank(vaultUrl)) {
 				return FormValidation.error("Vault URL cannot be blank.");
 			}
-
+			
 			try {
-				// Attempt to fetch credentials from Secret Server
-				UserCredentials credential = UserCredentials.get(credentialId, null);
+				UserCredentials credential = UserCredentials.get(credentialId, owner);
 				new VaultClient().fetchCredentials(vaultUrl, secretId, credential.getUsername(),
 						credential.getPassword().getPlainText());
 				return FormValidation.ok("Connection successful.");
