@@ -6,8 +6,6 @@ import java.util.Collections;
 import javax.annotation.Nullable;
 import javax.servlet.ServletException;
 
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -50,7 +48,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 * @param secretId      - The ID of the secret stored in the Secret Server.
 	 */
 	@DataBoundConstructor
-	public SecretServerCredentials(CredentialsScope scope, String id, String description, String vaultUrl,
+	public SecretServerCredentials(final CredentialsScope scope, final String id, final String description, String vaultUrl,
 			String credentialId, String secretId) {
 		super(scope, id, description, null, null);
 		this.vaultUrl = vaultUrl;
@@ -93,17 +91,16 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	}
 
 	@Nullable
-	private Item getContextItem() {
-		// Retrieve the nearest item in the current request context
-		if (Stapler.getCurrentRequest() != null) {
-			Item contextItem = Stapler.getCurrentRequest().findAncestorObject(Item.class);
-			if (contextItem != null) {
-				return contextItem;
-			}
-		}
-		// Return null to signify global scope as fallback
-		return null;
-	}
+    private Item getContextItem() {
+        // Retrieve the nearest item in the current request context
+        if (Stapler.getCurrentRequest() != null) {
+            Item contextItem = Stapler.getCurrentRequest().findAncestorObject(Item.class);
+            if (contextItem != null) {
+                return contextItem;
+            }
+        }
+        return null;
+    }
 
 	/**
 	 * Fetches the credentials (username and password) from the Secret Server only
@@ -147,14 +144,13 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 */
 		@POST
 		public ListBoxModel doFillCredentialIdItems(@AncestorInPath final Item owner) {
-		    // Check permissions for the current user
 		    if ((owner == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
 		            || (owner != null && !owner.hasPermission(CredentialsProvider.CREATE))) {
-		        return new StandardListBoxModel(); // Return an empty model if permissions are missing
+		        return new StandardListBoxModel();
 		    }
 		    return new StandardListBoxModel()
 		            .includeEmptyValue() 
-		            .includeAs(ACL.SYSTEM, owner, UserCredentials.class); // Only include UserCredentials type
+		            .includeAs(ACL.SYSTEM, owner, UserCredentials.class); 
 		}
 
 		/**
