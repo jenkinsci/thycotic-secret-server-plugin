@@ -139,7 +139,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 * Populates the list of available Credential IDs for the dropdown in the
 		 * Jenkins UI.
 		 *
-		 * @param item - The Jenkins item context.
+		 * @param owner - The Jenkins item context.
 		 * @return A ListBoxModel containing the available Credential IDs.
 		 */
 		@POST
