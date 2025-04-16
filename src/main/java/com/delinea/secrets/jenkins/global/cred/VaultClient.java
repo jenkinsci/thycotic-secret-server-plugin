@@ -30,11 +30,13 @@ public class VaultClient {
 	 * @param secretId The ID of the secret to fetch.
 	 * @param username The username for authenticating with the Vault.
 	 * @param password The password for authenticating with the Vault.
+	 * @param usernameSlug 
+	 * @param passwordSlugName 
 	 * @return A UsernamePassword object containing the fetched credentials, or null
 	 *         if not found.
 	 * @throws Exception if there is an error during the fetching process.
 	 */
-	public UsernamePassword fetchCredentials(String vaultUrl, String secretId, String username, String password)
+	public UsernamePassword fetchCredentials(String vaultUrl, String secretId, String username, String password, String usernameSlug, String passwordSlugName)
 			throws Exception {
 		// Create a map to hold properties for the Secret Server connection
 		Map<String, Object> properties = new HashMap<>();
@@ -58,16 +60,15 @@ public class VaultClient {
 
 			// Fetch the secret using the provided secret ID
 			Secret secret = applicationContext.getBean(SecretServer.class).getSecret(Integer.parseInt(secretId));
-
 			// Extract the username and password fields from the secret
 			Optional<String> fetchUsername = secret.getFields().stream()
-					.filter(field -> "Username".equalsIgnoreCase(field.getFieldName())).map(Secret.Field::getValue)
+					.filter(field -> usernameSlug.equalsIgnoreCase(field.getFieldName())|| usernameSlug.equalsIgnoreCase(field.getSlug())).map(Secret.Field::getValue)
 					.findFirst();
 
 			Optional<String> fetchPassword = secret.getFields().stream()
-					.filter(field -> "Password".equalsIgnoreCase(field.getFieldName())).map(Secret.Field::getValue)
+					.filter(field -> passwordSlugName.equalsIgnoreCase(field.getFieldName()) || passwordSlugName.equalsIgnoreCase(field.getSlug())).map(Secret.Field::getValue)
 					.findFirst();
-
+			
 			// Return the fetched credentials if both username and password are present
 			if (fetchUsername.isPresent() && fetchPassword.isPresent()) {
 				UsernamePassword usernamePassword = new UsernamePassword(fetchUsername.get(), fetchPassword.get());
@@ -95,4 +96,5 @@ public class VaultClient {
 			return username;
 		}
 	}
+
 }

@@ -30,8 +30,9 @@ import hudson.util.Secret;
 import jenkins.model.Jenkins;
 
 public class SecretServerCredentials extends UsernamePasswordCredentialsImpl implements StandardCredentials {
-
 	private static final long serialVersionUID = 1L;
+	private final String usernameSlug;
+	private final String passwordSlugName;
 	private final String vaultUrl;
 	private final String credentialId;
 	private final String secretId;
@@ -49,8 +50,10 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	@DataBoundConstructor
 	public SecretServerCredentials(final CredentialsScope scope, final String id, final String description, String vaultUrl,
-			String credentialId, String secretId) {
+			String credentialId, String secretId, String usernameSlug,String passwordSlugName) {
 		super(scope, id, description, null, null);
+		this.usernameSlug = usernameSlug;
+		this.passwordSlugName = passwordSlugName;
 		this.vaultUrl = vaultUrl;
 		this.credentialId = credentialId;
 		this.secretId = secretId;
@@ -67,6 +70,14 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 
 	public String getSecretId() {
 		return secretId;
+	}
+	
+	public String getUsernameSlug() {
+		return usernameSlug;
+	}
+	
+	public String getPasswordSlugName() {
+		return passwordSlugName;
 	}
 
 	/**
@@ -119,7 +130,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 							"UserCredentials with the specified credentialId not found in the folder context.");
 				}
 				vaultCredential = new VaultClient().fetchCredentials(vaultUrl, secretId, credential.getUsername(),
-						credential.getPassword().getPlainText());
+						credential.getPassword().getPlainText(), usernameSlug, passwordSlugName);
 			} catch (Exception e) {
 				throw new RuntimeException("Failed to fetch credentials from vault. " + e.getMessage());
 			}
@@ -195,6 +206,32 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 			return FormValidation.ok();
 		}
 
+		@POST
+		public FormValidation doCheckUsernameSlug(@AncestorInPath final Item item, @QueryParameter final String value)
+				throws IOException, ServletException {
+			if ((item == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (item != null && !item.hasPermission(CredentialsProvider.CREATE))) {
+		        return FormValidation.error("You do not have permission to perform this action.");
+		    }
+			if (StringUtils.isBlank(value)) {
+				return FormValidation.error("User slug name is required.");
+			}
+			return FormValidation.ok();
+		}
+		
+		@POST
+		public FormValidation doCheckPasswordSlugName(@AncestorInPath final Item item, @QueryParameter final String value)
+				throws IOException, ServletException {
+			if ((item == null && !Jenkins.get().hasPermission(CredentialsProvider.CREATE))
+		            || (item != null && !item.hasPermission(CredentialsProvider.CREATE))) {
+		        return FormValidation.error("You do not have permission to perform this action.");
+		    }
+			if (StringUtils.isBlank(value)) {
+				return FormValidation.error("Password slug name is required.");
+			}
+			return FormValidation.ok();
+		}
+		
 		/**
 		 * Tests the connection to the Secret Server using the provided parameters.
 		 *
@@ -207,6 +244,8 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		 */
 		@POST
 		public FormValidation doTestConnection(@AncestorInPath Item owner,
+				@QueryParameter("usernameSlug") final String usernameSlug,
+				@QueryParameter("passwordSlugName") final String passwordSlugName,
 				@QueryParameter("vaultUrl") final String vaultUrl,
 				@QueryParameter("credentialId") final String credentialId,
 				@QueryParameter("secretId") final String secretId) {
@@ -223,10 +262,18 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 				return FormValidation.error("Vault URL cannot be blank.");
 			}
 			
+			if (StringUtils.isBlank(usernameSlug)) {
+				return FormValidation.error("Slug name cannot be blank.");
+			}
+			
+			if (StringUtils.isBlank(passwordSlugName)) {
+				return FormValidation.error("Slug name cannot be blank.");
+			}
+			
 			try {
 				UserCredentials credential = UserCredentials.get(credentialId, owner);
 				new VaultClient().fetchCredentials(vaultUrl, secretId, credential.getUsername(),
-						credential.getPassword().getPlainText());
+						credential.getPassword().getPlainText(), usernameSlug,passwordSlugName);
 				return FormValidation.ok("Connection successful.");
 			} catch (Exception e) {
 				return FormValidation.error("Failed to establish connection: " + e.getMessage());
