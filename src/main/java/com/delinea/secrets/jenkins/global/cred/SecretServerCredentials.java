@@ -214,7 +214,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		        return FormValidation.error("You do not have permission to perform this action.");
 		    }
 			if (StringUtils.isBlank(value)) {
-				return FormValidation.error("User slug name is required.");
+				return FormValidation.error("Slug name is required.");
 			}
 			return FormValidation.ok();
 		}
@@ -227,7 +227,7 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 		        return FormValidation.error("You do not have permission to perform this action.");
 		    }
 			if (StringUtils.isBlank(value)) {
-				return FormValidation.error("Password slug name is required.");
+				return FormValidation.error("Slug name is required.");
 			}
 			return FormValidation.ok();
 		}

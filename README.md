@@ -30,9 +30,12 @@ After you have added your credentials to the build environment you can can use t
 ![add-Secret-Server-vault-credential](images/jenkins-vault-credential-provider.jpg)
 
 1. Create Credentials: 
-Create a `Secret Server user credentials` that contains the Secret Server service account credentials.
+Create a `Secret Server user credentials` that contains the Secret Server application account credentials.
 
-2. Configure Credentials: 
+2. Configure Credentials:
+Enter the `Username slug name`: Provide the slug name of the secret template associated with the secret you intend to retrieve from Secret Server(e.g., username, client-id).
+Enter the `Password slug name`: Provide the slug name of the secret template associated with the secret you intend to retrieve from Secret Server(e.g.,password, client-secret)
+> Note: If you're using a non-standard template, provide the custom slug name.
 Enter the `Vault URL, Secret ID,` and select the previously created Secret Server user credential in the `Credential ID` field.
 > Note: that the Username and Password fields are read-only.
 
