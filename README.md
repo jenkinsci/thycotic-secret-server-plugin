@@ -1,46 +1,30 @@
-# Delinea Secret Server
+# Delinea Secret Server Jenkins Plugin
 
 [![Jenkins Plugin Build](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml/badge.svg)](https://github.com/jenkinsci/thycotic-secret-server-plugin/actions/workflows/package.yml)
 
-The Delinea Secret Server Jenkins Plugin allows you to access and reference your Secret Server secrets for use in Jenkins builds.
 
-For more information, please refer to the [Delinea documentation](https://docs.delinea.com/online-help/integrations/jenkins/configure-jenkins.htm) .
+The **Delinea Secret Server Jenkins Plugin** allows you to access and reference your Secret Server secrets for use in Jenkins builds.
 
-## Usage
+For detailed information, refer to the [Delinea documentation](https://docs.delinea.com/online-help/integrations/jenkins/configure-jenkins.htm)
 
-1. This plugin add the ability to include Secret Server Secrets into your build environment.
+## Overview
+
+The integration offers two methods for fetching Secret Server secrets into Jenkins.
+
+### Fetching Secret Server secrets through a pipeline
+
+You can retrieve Secret Server secrets into your build environment through a dedicated pipeline, thus making them available in your Jenkins builds. The build environment configuration includes the ID of the secret to fetch and the URL of your Secret Server.
 
 ![build-environment](images/jenkins-build-environment.jpg)
 
-This is allows you to include the `Base URL` of you Secret Server and `Secret ID` you wish to access.
+This method is a good choice if you want to integrate fetched secrets into your build environment for different uses in Jenkins builds.
 
-Additionally you will need to include a valid credential provider.
+### Directly accessing and referencing Secret Server secrets
 
-![add-credential](images/jenkins-credential-provider.jpg)
+You can directly retrieve secrets into a configuration called **credential resolver** and store the fetched credentials either in the Jenkins global credentials store or in a specific folder, limiting access to the folder to only certain users.
 
-You will now have the option to change the `kind` of credential you wish to add, to that of a `SecretServer User Credentials`.
-
-After you have added your credentials to the build environment you can can use the secret in your build/s.
-
-> IMPORTANT: By default, this plugin will add a `TSS_` prefix to the environment variables. You should leave the `Environment Variable Prefix` field blank in the Jenkins UI when consuming your credential.
-
-
-2. This plugin add the ability to include Secret Server Secrets into global credentials.
+In addition to retrieving the standard **username** and **password** fields into the credential resolver, you can also fetch and store custom secret fields, for example, **client id** and **client secret**.
 
 ![add-Secret-Server-vault-credential](images/jenkins-vault-credential-provider.jpg)
 
-1. Create Credentials: 
-Create a `Secret Server user credentials` that contains the Secret Server service account credentials.
-
-2. Configure Credentials: 
-Enter the `Vault URL, Secret ID,` and select the previously created Secret Server user credential in the `Credential ID` field.
-> Note: that the Username and Password fields are read-only.
-
-3. Test Connection: 
-After filling in the required fields, click the `Test Connection` button.
-If all inputs are correct, a `Connection Successful` message will appear. Otherwise, an error message will be displayed.
-
-4. Create and Fetch Secrets: 
-Once the connection test is successful, click `Create` to fetch the secret from Secret.
-The fetched secret will include the username and password.
-
+This method is particularly useful if you want to be able to reference the stored secret values wherever you’re required to provide a username and password in Jenkins.
