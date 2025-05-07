@@ -5,7 +5,7 @@
 
 The **Delinea Secret Server Jenkins Plugin** allows you to access and reference your Secret Server secrets for use in Jenkins builds.
 
-For detailed information, refer to the [Delinea documentation](https://docs.delinea.com/online-help/integrations/jenkins/configure-jenkins.htm)
+For detailed information, refer to the [Delinea documentation](https://docs.delinea.com/online-help/integrations/jenkins/jenkins-build-secret-server.htm)
 
 ## Overview
 
