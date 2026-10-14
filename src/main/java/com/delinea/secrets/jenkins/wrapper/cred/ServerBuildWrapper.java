@@ -1,10 +1,11 @@
 package com.delinea.secrets.jenkins.wrapper.cred;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -38,7 +39,10 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
     private static final String AUTO_COMMENT = "autoComment";
 
     private List<ServerSecret> secrets;
-    private List<String> valuesToMask = new ArrayList<>();
+    // Values to mask, per build. Freestyle jobs share one wrapper instance across concurrent builds, so a
+    // single shared list raced (ConcurrentModificationException) and mixed values between builds.
+    // Weak keys let finished builds drop out; transient because this is runtime state, not configuration.
+    private transient Map<Run<?,?>, List<String>> valuesToMask;
 
     @DataBoundConstructor
     public ServerBuildWrapper(final List<ServerSecret> secrets) {
@@ -54,9 +58,18 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
         this.secrets = secrets;
     }
 
+    // Freestyle calls createLoggerDecorator before setUp; pipeline (CoreWrapperStep) calls setUp first.
+    // Both resolve the same per-build list here, so the order doesn't matter.
+    synchronized List<String> getValuesToMask(final Run<?,?> build) {
+        if (valuesToMask == null) {
+            valuesToMask = new WeakHashMap<>();
+        }
+        return valuesToMask.computeIfAbsent(build, b -> new CopyOnWriteArrayList<>());
+    }
+
     @Override
     public ConsoleLogFilter createLoggerDecorator(final Run<?,?> build) {
-        return new ServerConsoleLogFilter(build.getCharset().name(), valuesToMask);
+        return new ServerConsoleLogFilter(build.getCharset().name(), getValuesToMask(build));
     }
 
     @Override
@@ -69,6 +82,7 @@ public class ServerBuildWrapper extends SimpleBuildWrapper {
             throws IOException, InterruptedException {
 
         final ServerConfiguration configuration = ExtensionList.lookupSingleton(ServerConfiguration.class);
+        final List<String> valuesToMask = getValuesToMask(build);
 
         // Loop through each secret config
         for (ServerSecret serverSecret : secrets) {
