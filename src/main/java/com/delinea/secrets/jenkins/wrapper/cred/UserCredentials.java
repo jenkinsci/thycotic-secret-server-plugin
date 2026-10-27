@@ -52,6 +52,32 @@ public class UserCredentials extends UsernamePasswordCredentialsImpl implements 
 		return null;
 	}
 
+	/**
+	 * Resolves the credentials of this type with this credentialId for internal
+	 * use, without checking the permissions of the calling thread.
+	 * <p>
+	 * Use this when Jenkins itself needs the credential (e.g. an agent launcher
+	 * resolving a {@code SecretServerCredentials}), where the current thread may
+	 * run as anonymous. Callers handling user requests must use
+	 * {@link #get(String, Item)} instead.
+	 * <p>
+	 * With a {@code null} item the lookup is done at the Jenkins root, which
+	 * includes {@code SYSTEM}-scoped credentials. With an item, scoping rules apply
+	 * and {@code SYSTEM}-scoped credentials are not visible.
+	 *
+	 * @param credentialId the id of the credential
+	 * @param item         the optional item (context)
+	 * @return the credentials or {@code null} if no matching credentials exist
+	 */
+	public static UserCredentials lookup(@Nonnull final String credentialId, @Nullable final Item item) {
+		if (item != null) {
+			return CredentialsMatchers.firstOrNull(CredentialsProvider.lookupCredentials(UserCredentials.class, item,
+					ACL.SYSTEM, Collections.emptyList()), new IdMatcher(credentialId));
+		}
+		return CredentialsMatchers.firstOrNull(CredentialsProvider.lookupCredentials(UserCredentials.class,
+				Jenkins.get(), ACL.SYSTEM, Collections.emptyList()), new IdMatcher(credentialId));
+	}
+
     @DataBoundConstructor
     public UserCredentials(final CredentialsScope scope, final String id, final String description,
             final String username, final String password) throws FormException {

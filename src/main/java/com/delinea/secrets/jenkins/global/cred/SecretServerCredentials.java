@@ -167,7 +167,9 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 	 */
 	private UsernamePassword getVaultCredential(@Nullable Item contextItem) {
 	    try {
-	        UserCredentials credential = UserCredentials.get(credentialId, contextItem);
+	        // Resolved internally (e.g. by agent launchers running as anonymous), so
+	        // the caller's permissions are not checked here.
+	        UserCredentials credential = UserCredentials.lookup(credentialId, contextItem);
 	        if (credential == null) {
 	            throw new RuntimeException("UserCredentials not found for credentialId: " + credentialId);
 	        }
@@ -327,6 +329,9 @@ public class SecretServerCredentials extends UsernamePasswordCredentialsImpl imp
 			
 			try {
 				UserCredentials credential = UserCredentials.get(credentialId, owner);
+				if (credential == null) {
+					return FormValidation.error("Credential ID not found. Please provide a valid ID.");
+				}
 				String ph = useProxy ? proxyHost : null;
 				String pp = useProxy ? proxyPort : null;
 				String pu = useProxy ? proxyUsername : null;
